@@ -22,8 +22,8 @@ struct DeferredReq {
 class Plugin : public collision_avoidance_base::CollisionAvoidanceBase {
 public:
 
-  void initialize(rclcpp::Node * node,
-                  std::shared_ptr<as2_ca::CAGatewayClient> ca,
+  void initialize(rclcpp_lifecycle::LifecycleNode * node,
+                  std::shared_ptr<ca_structure::CAGatewayClient> ca,
                   const std::string & own_id) override
   {
     node_   = node;
@@ -221,8 +221,8 @@ private:
 
   // ── State ────────────────────────────────────────────────────────────────────
   mutable std::mutex mu_;
-  rclcpp::Node * node_{nullptr};
-  std::shared_ptr<as2_ca::CAGatewayClient> ca_;
+  rclcpp_lifecycle::LifecycleNode * node_{nullptr};
+  std::shared_ptr<ca_structure::CAGatewayClient> ca_;
   std::string own_id_;
   std::string state_{"IDLE"};
 

@@ -2,7 +2,11 @@
 <package format="3">
   <name>collision_avoidance_behavior</name>
   <version>1.0.0</version>
-  <description>Distributed path-lock collision avoidance behavior for Aerostack2</description>
+  <description>
+    Distributed path-lock collision avoidance behavior for cs4home architecture.
+    Inherits from cs4home_core::CognitiveModule; uses ca_structure for
+    inter-agent lock negotiation.
+  </description>
   <maintainer email="g.glenza@upm.es">Guillermo GP-Lenza</maintainer>
   <license>BSD-3-Clause</license>
 
@@ -10,12 +14,14 @@
 
   <depend>rclcpp</depend>
   <depend>rclcpp_action</depend>
+  <depend>rclcpp_lifecycle</depend>
   <depend>rclcpp_components</depend>
+  <depend>rclcpp_cascade_lifecycle</depend>
+  <depend>lifecycle_msgs</depend>
   <depend>pluginlib</depend>
-  <depend>as2_core</depend>
-  <depend>as2_behavior</depend>
+  <depend>cs4home_core</depend>
+  <depend>ca_structure</depend>
   <depend>as2_msgs</depend>
-  <depend>as2_ca</depend>
   <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>std_srvs</depend>

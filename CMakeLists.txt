@@ -5,28 +5,30 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# Dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_action REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(pluginlib REQUIRED)
-find_package(as2_core REQUIRED)
-find_package(as2_behavior REQUIRED)
-find_package(as2_msgs REQUIRED)
-find_package(as2_ca REQUIRED)
-find_package(nav_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(std_srvs REQUIRED)
-find_package(eigen3_cmake_module REQUIRED)
-find_package(Eigen3 REQUIRED)
-
 set(DEPS
-  rclcpp rclcpp_action rclcpp_components pluginlib
-  as2_core as2_behavior as2_msgs as2_ca
-  nav_msgs geometry_msgs std_srvs Eigen3)
+  rclcpp
+  rclcpp_action
+  rclcpp_lifecycle
+  rclcpp_components
+  rclcpp_cascade_lifecycle
+  lifecycle_msgs
+  pluginlib
+  cs4home_core
+  ca_structure
+  as2_msgs
+  nav_msgs
+  geometry_msgs
+  std_srvs
+  eigen3_cmake_module
+)
 
-# ── Shared plugin library ──────────────────────────────────────────────────────
+foreach(DEP ${DEPS})
+  find_package(${DEP} REQUIRED)
+endforeach()
+find_package(Eigen3 REQUIRED)
+list(APPEND DEPS Eigen3)
+
+# ── Plugin shared library ─────────────────────────────────────────────────────
 add_library(${PROJECT_NAME} SHARED
   src/path_geometry.cpp
   plugins/pairwise_path_lock_plugin.cpp
@@ -38,22 +40,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 ament_target_dependencies(${PROJECT_NAME} ${DEPS})
 pluginlib_export_plugin_description_file(${PROJECT_NAME} plugins.xml)
 
-# ── Behavior server library (component) ───────────────────────────────────────
-add_library(collision_avoidance_behavior_component SHARED
-  src/collision_avoidance_behavior.cpp
-)
-target_include_directories(collision_avoidance_behavior_component PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(collision_avoidance_behavior_component ${DEPS})
-rclcpp_components_register_nodes(collision_avoidance_behavior_component
-  "collision_avoidance_behavior::CollisionAvoidanceBehavior")
-
-# ── Standalone node executable ─────────────────────────────────────────────────
+# ── Behavior node (Afferent + Core + CognitiveModule) ────────────────────────
 add_executable(collision_avoidance_behavior_node
-  src/collision_avoidance_behavior_node.cpp
+  src/collision_avoidance_behavior_afferent.cpp
+  src/collision_avoidance_behavior_core.cpp
   src/collision_avoidance_behavior.cpp
+  src/collision_avoidance_behavior_node.cpp
   src/path_geometry.cpp
 )
 target_include_directories(collision_avoidance_behavior_node PUBLIC
@@ -66,7 +58,6 @@ target_link_libraries(collision_avoidance_behavior_node ${PROJECT_NAME})
 # ── Install ───────────────────────────────────────────────────────────────────
 install(TARGETS
   ${PROJECT_NAME}
-  collision_avoidance_behavior_component
   collision_avoidance_behavior_node
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
