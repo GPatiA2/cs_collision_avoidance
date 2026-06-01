@@ -1,6 +1,6 @@
 # collision_avoidance_behavior
 
-Distributed path-lock collision avoidance behavior for multi-agent systems built with [Aerostack2](https://github.com/aerostack2/aerostack2), using pairwise mutual-exclusion locks over [as2_ca](https://github.com/CoreSenseEU/collective_awareness_structure) to prevent drones from occupying conflicting flight paths simultaneously.
+Distributed path-lock collision avoidance behavior for multi-agent systems built with [Aerostack2](https://github.com/GPatiA2/aerostack2), using pairwise mutual-exclusion locks over [as2_ca](https://github.com/CoreSenseEU/collective_awareness_structure) to prevent drones from occupying conflicting flight paths simultaneously.
 
 ## Overview
 
@@ -25,19 +25,43 @@ The collision-detection strategy is provided by a **plugin** (`pairwise_path_loc
 
 ## Installation
 
+### 1. Build the required Aerostack2 packages
+
+Clone the [GPatiA2/aerostack2](https://github.com/GPatiA2/aerostack2) fork and build only the packages this behavior depends on:
+
 ```bash
+mkdir -p ~/aerostack2_ws/src
+cd ~/aerostack2_ws/src
+git clone https://github.com/GPatiA2/aerostack2.git
+cd ~/aerostack2_ws
+colcon build --packages-select as2_msgs as2_core as2_behavior as2_ca
+```
+
+Required packages:
+
+| Package | Role |
+|---|---|
+| `as2_msgs` | ROS 2 message and action definitions |
+| `as2_core` | Node base class, state interface, synchronous service client |
+| `as2_behavior` | Behavior server framework (`BehaviorServer<A>`) |
+| `as2_ca` | Collective Awareness gateway client for inter-agent communication |
+
+Additional system dependencies:
+
+```bash
+sudo apt install ros-${ROS_DISTRO}-eigen3-cmake-module libeigen3-dev
+```
+
+### 2. Build this package
+
+```bash
+mkdir -p ~/cs_test_ws/src
 cd ~/cs_test_ws/src
 git clone <this-repository>
 cd ~/cs_test_ws
 source ~/aerostack2_ws/install/setup.bash
 colcon build --packages-select collision_avoidance_behavior
 ```
-
-Dependencies (provided by Aerostack2):
-
-- `as2_core`, `as2_behavior`, `as2_msgs`, `as2_ca`
-- `pluginlib`, `rclcpp`, `rclcpp_action`, `geometry_msgs`, `std_srvs`
-- `Eigen3`
 
 ## CollisionAvoidanceBehavior node
 
